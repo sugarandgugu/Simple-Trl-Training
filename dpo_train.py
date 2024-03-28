@@ -32,6 +32,28 @@ from transformers import AutoTokenizer,AutoModelForCausalLM,TrainingArguments,GP
 import warnings
 warnings.filterwarnings("ignore")
 
+
+'''
+    ref: https://github.com/yangjianxin1/Firefly/blob/master/train.py
+'''
+def find_all_linear_names(model, train_mode):
+    """
+    找出所有全连接层，为所有全连接添加adapter
+    """
+    assert train_mode in ['lora', 'qlora']
+    cls = bnb.nn.Linear4bit if train_mode == 'qlora' else nn.Linear
+    lora_module_names = set()
+    for name, module in model.named_modules():
+        if isinstance(module, cls):
+            names = name.split('.')
+            lora_module_names.add(names[0] if len(names) == 1 else names[-1])
+
+    if 'lm_head' in lora_module_names:  # needed for 16-bit
+        lora_module_names.remove('lm_head')
+    lora_module_names = list(lora_module_names)
+    logger.info(f'LoRA target module names: {lora_module_names}')
+    return lora_module_names
+
 def run():
     file = ''
     model_file = ''
@@ -56,14 +78,13 @@ def run():
     # 加载数据集
     train_dataset = dpo_dataset(file = file, tokenizer = tokenizer, max_seq_length = 50)
     # Lora
+    target_modules = find_all_linear_names(model, 'qlora')
     config = LoraConfig(
         r=8,
         lora_alpha=16,
         lora_dropout=0.05,
         bias="none",
-        target_modules=[
-                "q_proj",
-                "v_proj",],
+        target_modules=target_modules,
         task_type="CAUSAL_LM")
     # peft model
     model = get_peft_model(model,config)
