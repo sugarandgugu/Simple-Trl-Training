@@ -75,7 +75,7 @@ device = '2,3,5'  # 本次实验需要用到的卡
 os.environ["CUDA_VISIBLE_DEVICES"] = device
 os.environ['CUDA_LAUNCH_BLOCKING'] = device
 # ================ 分割线 ===================
-# 这样写就能正常运行  (不知道啥原因)
+# 这样写就能正常运行  (不知道啥原因)  ps: 是因为先导入了torch包，默认调用了第0张显卡，把torch放后面即可。
 import os
 device = '2,3,5'  # 本次实验需要用到的卡
 os.environ["CUDA_VISIBLE_DEVICES"] = device
