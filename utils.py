@@ -30,16 +30,19 @@ class dpo_dataset(Dataset):
     def __getitem__(self,index):
         # 取出data_list的一条数据  --> {"chosen":xxx,"rejected":xxx,"prompt":xxx} 一条数据是这样的格式
         data = self.data_list[index]
-        # 对prompt reject和chosen进行tokenize  判断是否需要截断 保证所有的input_ids都一样 不够长度的直接padding
-        prompt_input_ids = self.tokenizer.encode(data['prompt'],add_special_tokens=False,max_length=self.max_seq_length,padding='max_length')
-        chosen_input_ids = self.tokenizer.encode(data['chosen'],add_special_tokens=False,max_length=self.max_seq_length,padding='max_length')
-        rejected_input_ids = self.tokenizer.encode(data['rejected'],add_special_tokens=False,max_length=self.max_seq_length,padding='max_length')
 
+        # 对prompt reject和chosen进行tokenize  判断是否需要截断 保证所有的input_ids都一样 不够长度的直接padding  
+        # 适配qwen 的 template  添加eos token
+        prompt_input_ids = self.tokenizer.encode('<|im_start|>' + data['prompt'] + '<|im_end|>',add_special_tokens=False)
+        chosen_input_ids = self.tokenizer.encode(data['chosen'],add_special_tokens=False)
+        rejected_input_ids = self.tokenizer.encode(data['rejected'],add_special_tokens=False)
+
+        prompt_input_ids = prompt_input_ids + [self.tokenizer.pad_token_id]
         # 设置labels
-        chosen_labels = [-100] * len(prompt_input_ids) + chosen_input_ids
-        rejected_labels = [-100] * len(prompt_input_ids) + rejected_input_ids
-        chosen_input_ids = prompt_input_ids + chosen_input_ids
-        rejected_input_ids = prompt_input_ids + rejected_input_ids
+        chosen_labels = [-100] * len(prompt_input_ids) + chosen_input_ids + [self.tokenizer.pad_token_id]
+        rejected_labels = [-100] * len(prompt_input_ids) + rejected_input_ids + [self.tokenizer.pad_token_id]
+        chosen_input_ids = prompt_input_ids + chosen_input_ids + [self.tokenizer.pad_token_id]
+        rejected_input_ids = prompt_input_ids + rejected_input_ids + [self.tokenizer.pad_token_id]
 
         assert len(chosen_labels) == len(chosen_input_ids)
         assert len(rejected_labels) == len(rejected_input_ids)
@@ -57,6 +60,7 @@ class dpo_dataset(Dataset):
         return inputs
     def map(self, func, **kwargs):
         return self
+
 
 
 class MyCallback(TrainerCallback):
