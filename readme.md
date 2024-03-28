@@ -49,7 +49,7 @@ python dpo_train.py
 ```
 
 后台启动该项目:
-
+ps: 在后台挂载启动，这样关了服务器代码还是在运行的，不会断掉。
 ```python
 nohub python dpo_train.py > train_log.log
 ```
