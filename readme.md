@@ -63,6 +63,27 @@ pip install tensorboard -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 tensorboard --logdir='your path'
 ```
+### 报错
+1、显存爆了，参考如下:
+```python
+# 这样写，指定的显卡会检测不到，一直用第0张显卡
+import os
+import torch
+import bitsandbytes as bnb
+import torch.nn as nn
+device = '2,3,5'  # 本次实验需要用到的卡
+os.environ["CUDA_VISIBLE_DEVICES"] = device
+os.environ['CUDA_LAUNCH_BLOCKING'] = device
+# ================ 分割线 ===================
+# 这样写就能正常运行  (不知道啥原因)
+import os
+device = '2,3,5'  # 本次实验需要用到的卡
+os.environ["CUDA_VISIBLE_DEVICES"] = device
+os.environ['CUDA_LAUNCH_BLOCKING'] = device
+import torch
+import bitsandbytes as bnb
+import torch.nn as nn
+```
 
 ### 参考资料
 
