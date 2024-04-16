@@ -115,3 +115,5 @@ import torch.nn as nn
 3、https://github.com/lansinuote/Simple_TRL/blob/main/1.dpo_trl%E8%AE%AD%E7%BB%83.ipynb
 
 4、https://github.com/datawhalechina/self-llm/blob/master/Qwen/04-Qwen-7B-Chat%20Lora%20%E5%BE%AE%E8%B0%83.md
+
+5、https://github.com/hiyouga/LLaMA-Factory/tree/main/data
