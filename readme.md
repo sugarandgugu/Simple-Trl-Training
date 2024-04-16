@@ -84,7 +84,28 @@ import torch
 import bitsandbytes as bnb
 import torch.nn as nn
 ```
-
+### LLaMA-Factory dpo 微调
+背景: 自己写的代码毕竟还是没有那么全面，所以考虑利用LLaMA-Factory这个库进行微调，但是在使用的时候，我不知道他们数据要求，在跑起来之后，把数据集格式放在这里供大家参考。
+这个库主要是通过dataset_info.json来控制你的数据集，下面我给出我的数据格式以及dataset_info.json的内容。
+```python
+# ps: output是一个列表，前面代表chosen 后面代表rejected。
+{
+  "instruction": "你们这里有高速气泡吗？",
+  "input": "",
+  "output": ["您好，关于高速气泡，我们需要先确认一下库存和型号。麻烦您留下联系方式，稍后我们的客服会给您回电确认。", "对不起，我们这里没有高速气泡，您可能需要去其他商家那里看看。"]
+}
+# ps: 下面是dataset_info.json的内容吗，test_dpo就是你自己取的名字(随便写).file_name我一般把数据放在它这个库的data文件夹下面，注意要ranking等于true，它才会判断是dpo数据集。
+下面的column是按照它库的要求写的。
+  "test_dpo":{
+    "file_name":"test_dpo.json",
+    "ranking":true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    }
+  },
+```
 ### 参考资料
 
 1、https://zhuanlan.zhihu.com/p/641620563
