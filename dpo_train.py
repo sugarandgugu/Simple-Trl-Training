@@ -10,7 +10,7 @@
     File: dpo_train.py
     Desc: DPO训练代码
     Author: sugar(@google.com)
-    Date: 2024-03-26 14:19
+    Date: 2024-03-26 14:20
 """
 import os
 import torch
